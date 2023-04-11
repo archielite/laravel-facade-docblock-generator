@@ -1,0 +1,46 @@
+{
+    "name": "archielite/laravel-facade-docblock-generator",
+    "description": "Laravel Development Tools",
+    "keywords": [
+        "archi elite",
+        "php",
+        "laravel",
+        "laravel-facade-docblock-generator",
+        "console"
+    ],
+    "authors": [
+        {
+            "name": "Archi Elite",
+            "email": "contact@archielite.com"
+        }
+    ],
+    "homepage": "https://github.com/archielite/laravel-facade-docblock-generator",
+    "license": "MIT",
+    "require": {
+        "php": "^8.0",
+        "laravel/framework": "^9.49|^10.0",
+        "phpstan/phpdoc-parser": "^1.15",
+        "symfony/finder": "^6.0"
+    },
+    "require-dev": {
+        "laravel/pint": "^0.2.4"
+    },
+    "autoload": {
+        "psr-4": {
+            "ArchiElite\\LaravelFacadeDocBlockGenerator\\": "src/"
+        }
+    },
+    "scripts": {
+        "lint": "vendor/bin/pint --test"
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "ArchiElite\\LaravelFacadeDocBlockGenerator\\LaravelFacadeDocBlockGeneratorServiceProvider"
+            ]
+        }
+    }
+}
