@@ -208,7 +208,7 @@ class FacadeDocblockGenerateCommand extends Command
             'name' => $method->getName(),
             'parameters' => $this->resolveParameters($method)
                 ->map(fn ($parameter) => [
-                    'name' => '$'.$parameter->getName(),
+                    'name' => '$' . $parameter->getName(),
                     'optional' => $parameter->isOptional() && ! $parameter->isVariadic(),
                     'default' => $parameter->isDefaultValueAvailable()
                         ? $parameter->getDefaultValue()
@@ -257,17 +257,17 @@ class FacadeDocblockGenerateCommand extends Command
     protected function resolveDocblockTypes(ReflectionMethodDecorator $method, TypeNode $typeNode): string
     {
         if ($typeNode instanceof UnionTypeNode) {
-            return '('.collect($typeNode->types)
+            return '(' . collect($typeNode->types)
                     ->map(fn ($node) => $this->resolveDocblockTypes($method, $node))
                     ->unique()
-                    ->implode('|').')';
+                    ->implode('|') . ')';
         }
 
         if ($typeNode instanceof IntersectionTypeNode) {
-            return '('.collect($typeNode->types)
+            return '(' . collect($typeNode->types)
                     ->map(fn ($node) => $this->resolveDocblockTypes($method, $node))
                     ->unique()
-                    ->implode('&').')';
+                    ->implode('&') . ')';
         }
 
         if ($typeNode instanceof GenericTypeNode) {
@@ -275,20 +275,20 @@ class FacadeDocblockGenerateCommand extends Command
         }
 
         if ($typeNode instanceof ThisTypeNode) {
-            return '\\'.$method->sourceClass()->getName();
+            return '\\' . $method->sourceClass()->getName();
         }
 
         if ($typeNode instanceof ArrayTypeNode) {
-            return $this->resolveDocblockTypes($method, $typeNode->type).'[]';
+            return $this->resolveDocblockTypes($method, $typeNode->type) . '[]';
         }
 
         if ($typeNode instanceof IdentifierTypeNode) {
             if ($typeNode->name === 'static') {
-                return '\\'.$method->sourceClass()->getName();
+                return '\\' . $method->sourceClass()->getName();
             }
 
             if ($typeNode->name === 'self') {
-                return '\\'.$method->getDeclaringClass()->getName();
+                return '\\' . $method->getDeclaringClass()->getName();
             }
 
             if ($this->isBuiltIn($typeNode->name)) {
@@ -323,14 +323,14 @@ class FacadeDocblockGenerateCommand extends Command
         }
 
         if ($typeNode instanceof NullableTypeNode) {
-            return '?'.$this->resolveDocblockTypes($method, $typeNode->type);
+            return '?' . $this->resolveDocblockTypes($method, $typeNode->type);
         }
 
         if ($typeNode instanceof CallableTypeNode) {
             return $this->resolveDocblockTypes($method, $typeNode->identifier);
         }
 
-        $this->components->error('Unhandled type: '.$typeNode::class);
+        $this->components->error('Unhandled type: ' . $typeNode::class);
         $this->components->error('You may need to update the `resolveDocblockTypes` to handle this type.');
         exit(self::FAILURE);
     }
@@ -339,7 +339,7 @@ class FacadeDocblockGenerateCommand extends Command
     {
         return $this->resolveDocTags($class->getDocComment() ?: '', '@method')
             ->map(fn ($tag) => Str::squish($tag))
-            ->map(fn ($tag) => Str::before($tag, ')').')');
+            ->map(fn ($tag) => Str::before($tag, ')') . ')');
     }
 
     protected function resolveDocMixins(ReflectionClass $class): Collection
@@ -398,9 +398,9 @@ class FacadeDocblockGenerateCommand extends Command
                 $parameters = $method['parameters']->map(function ($parameter) {
                     $rest = $parameter['variadic'] ? '...' : '';
 
-                    $default = $parameter['optional'] ? ' = '.$this->resolveDefaultValue($parameter) : '';
+                    $default = $parameter['optional'] ? ' = ' . $this->resolveDefaultValue($parameter) : '';
 
-                    $parameter['type'] = empty($parameter['type']) ? '' : $parameter['type'].' ';
+                    $parameter['type'] = empty($parameter['type']) ? '' : $parameter['type'] . ' ';
 
                     return "{$parameter['type']}{$rest}{$parameter['name']}{$default}";
                 });
@@ -420,6 +420,7 @@ class FacadeDocblockGenerateCommand extends Command
 
             if (($facade->getDocComment() ?: '') === $docblock) {
                 $this->components->warn("Docblock for [{$facade->getName()}] is up to date. Skip...");
+
                 return;
             }
 
@@ -427,7 +428,7 @@ class FacadeDocblockGenerateCommand extends Command
             $contents = Str::replace($facade->getDocComment(), $docblock, $contents);
             file_put_contents($facade->getFileName(), $contents);
 
-            $this->components->info('Docblock for ['.$facade->getName().'] generated');
+            $this->components->info('Docblock for [' . $facade->getName() . '] generated');
         });
     }
 
@@ -463,7 +464,7 @@ class FacadeDocblockGenerateCommand extends Command
     protected function resolveDocParamType(ReflectionMethodDecorator $method, DynamicParameter|ReflectionParameter $parameter): string|null
     {
         $paramTypeNode = collect($this->parseDocblock($method->getDocComment())->getParamTagValues())
-            ->firstWhere('parameterName', '$'.$parameter->getName());
+            ->firstWhere('parameterName', '$' . $parameter->getName());
 
         // As we didn't find a param type, we will now recursivly check if the prototype has a value specified...
 
@@ -512,11 +513,11 @@ class FacadeDocblockGenerateCommand extends Command
         }
 
         if ($type instanceof ReflectionNamedType && $type->getName() === 'null') {
-            return ($type->isBuiltin() ? '' : '\\').$type->getName();
+            return ($type->isBuiltin() ? '' : '\\') . $type->getName();
         }
 
         if ($type instanceof ReflectionNamedType && $type->getName() !== 'null') {
-            return ($type->isBuiltin() || $this->isBuiltIn($type->getName()) ? '' : '\\').$type->getName().($type->allowsNull() ? '|null' : '');
+            return ($type->isBuiltin() || $this->isBuiltIn($type->getName()) ? '' : '\\') . $type->getName() . ($type->allowsNull() ? '|null' : '');
         }
 
         return null;
